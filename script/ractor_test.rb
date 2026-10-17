@@ -73,9 +73,20 @@ def build_env(spec)
   }.merge(spec["headers"] || {}).compact
 end
 
+# Ractorize the application the way config.ru does before serving.
+def ractorize_application
+  Rails.application.ractorize!
+
+  begin
+    require "i18n/ractorize"
+  rescue LoadError
+    # Released i18n has no Ractor support; the template pins Shopify/i18n ractor_support.
+  end
+end
+
 def test_application_shareability
   label = "application is shareable"
-  Rails.application.ractorize!
+  ractorize_application
 
   if Ractor.shareable?(Rails.application)
     pass(label)
@@ -153,7 +164,7 @@ if phases.include?("request")
   puts
   puts "Phase 2: HTTP requests in Ractor"
   puts "-" * 50
-  Rails.application.ractorize! unless Rails.application.frozen?
+  ractorize_application unless Rails.application.frozen?
   REQUESTS.each { |spec| test_request(spec) }
 end
 
