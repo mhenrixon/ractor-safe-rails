@@ -30,6 +30,9 @@
 
 /public/assets
 
+# Schema cache dumps written by bin/ractor-test.
+/db/*schema_cache.yml
+
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
