@@ -1,0 +1,21 @@
+script/ractor_test.rb
+  s_4786a62cd35147::t_5728369eaa7c90 15-19,25,28-29
+db/seeds.rb
+  s_4786a62cd35147::t_76c9e04e7e3901 4-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4e8ed0bf33807de4f71498c09f3433f8b1a4e3c7",
+  "prompts": {},
+  "sessions": {
+    "s_4786a62cd35147": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1e58604-bb1b-456c-ace0-8fe7f151dae8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "mhenrixon <mikael@mhenrixon.com>"
+    }
+  }
+}
