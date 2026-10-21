@@ -12,26 +12,21 @@ require "yaml"
 # would. With check_schema_cache_dump_version = false (set by the template), a
 # production boot defines attribute methods for the models whose tables are in
 # db/schema_cache.yml; without the dump, a model's first use in a request
-# Ractor would have to define them.
-puts "Preparing database..."
-system(File.expand_path("../bin/rails", __dir__), "db:prepare", "db:schema:cache:dump", exception: true)
+# Ractor would have to define them. Seeding runs in the same separate process:
+# using Post in this one would define its attribute methods on the main Ractor
+# and hide whether the boot did.
+puts "Preparing and seeding the database..."
+system(File.expand_path("../bin/rails", __dir__), "db:prepare", "db:schema:cache:dump", "db:seed", exception: true)
 
 require_relative "../config/environment"
 
 ActionController::Base.allow_forgery_protection = false
 
-puts "Resetting database..."
-# Seed with SQL, not through Post: using a model here would define its
-# attribute methods on the main Ractor and hide whether the boot did.
+# The ids of the posts db/seeds.rb created, without going through Post.
 seed_post_id, delete_post_id = ActiveRecord::Base.with_connection do |connection|
-  connection.delete("DELETE FROM posts")
-  now = connection.quote(Time.now.utc)
-
   [ "Seed post body from Ractor test", "Delete me from Ractor test" ].map do |body|
-    connection.insert(
-      "INSERT INTO posts (body, created_at, updated_at) VALUES (#{connection.quote(body)}, #{now}, #{now})",
-      "Seed", "id"
-    )
+    connection.select_value("SELECT id FROM posts WHERE body = #{connection.quote(body)}") ||
+      abort("db/seeds.rb didn't create the post #{body.inspect}")
   end
 end
 puts "Database seeded."
